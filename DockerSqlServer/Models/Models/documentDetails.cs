@@ -1,9 +1,11 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DockerSqlServer.Models
 {
-    public class documentDetails
+    [Table("documentDetails", Schema = "hr")]
+    public class DocumentDetails
     {
         [Key]
         public Int32 Id { get; set; }

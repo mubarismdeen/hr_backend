@@ -4,8 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DockerSqlServer.Models
 {
-    [Table("leaveSalary", Schema = "hr")]
-    public class LeaveSalary
+    public class SalaryPay
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -15,39 +14,38 @@ namespace DockerSqlServer.Models
         public short EmpCode { get; set; }
 
         [Required]
-        [Column(TypeName = "decimal(8,2)")]
-        public decimal Salary { get; set; }
+        public string name { get; set; }
 
         [Required]
-        public short Attendance { get; set; }
+        public decimal Basic { get; set; }
 
         [Required]
-        public short OffDays { get; set; }
+        public decimal Attendance { get; set; }
 
         [Required]
-        public short SickLeave { get; set; }
+        public decimal Novt { get; set; }
 
         [Required]
-        public short PayAmt { get; set; }
+        public decimal Sovt { get; set; }
 
         [Required]
-        public short LsDays { get; set; }
+        public decimal Overseas { get; set; }
 
         [Required]
-        public short PaidAmt { get; set; }
+        public decimal Anchorage { get; set; }
 
         [Required]
-        [StringLength(5)]
-        public string Year { get; set; }
+        public decimal due { get; set; }
 
         [Required]
-        public short EditBy { get; set; }
+        public decimal Total { get; set; }
+
+        [Required]
+        [MaxLength(7)]
+        public string Date { get; set; }
 
         [Required]
         public DateTime EditDt { get; set; }
-
-        [Required]
-        public short CreatBy { get; set; }
 
         [Required]
         public DateTime CreatDt { get; set; }

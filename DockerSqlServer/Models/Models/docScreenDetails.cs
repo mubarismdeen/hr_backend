@@ -8,6 +8,7 @@ namespace DockerSqlServer.Models
         [Key]
         public Int32 Id { get; set; }
         public string narration { get; set; }
+        public string name { get; set; }
         public string docType { get; set; }
         public DateTime? dueDate { get; set; }
         public DateTime? renewedDate { get; set; }
