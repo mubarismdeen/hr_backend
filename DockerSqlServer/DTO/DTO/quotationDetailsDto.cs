@@ -12,12 +12,14 @@ namespace DockerSqlServer.DTO
         public string Narration { get; set; }
         public string Name { get; set; }
         public string Date { get; set; }
-        public int QuotationNo { get; set; }
         public int InvoiceNo { get; set; }
+        public int PoNo { get; set; }
+        public decimal InvoiceAmt { get; set; }
+        public int PoRefNo { get; set; }
+        public int ReportNo { get; set; }
         public string PoStatus { get; set; }
         public string InvStatus { get; set; }
         public string Type { get; set; }
-        public byte DocId { get; set; }
         public string DueDate { get; set; }
         public string EditBy { get; set; }
         public DateTime EditDt { get; set; }

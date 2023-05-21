@@ -192,11 +192,11 @@ namespace DockerSqlServer.Controllers
                         leaveSalary.EmpCode = attendance.EmpCode;
                         leaveSalary.Attendance = attendance.attendance;
                         leaveSalary.SickLeave = attendance.OffDays - attendance.Lop;
-                        leaveSalary.Salary  = salaryMaster.Salary;
-                        leaveSalary.PayAmt  = (leaveSalary.SickLeave + attendance.attendance) * (salaryMaster.Salary / 335);
-                        leaveSalary.Id      = 0;
+                        leaveSalary.Salary = salaryMaster.Salary;
+                        leaveSalary.PayAmt = (leaveSalary.SickLeave + attendance.attendance) * (salaryMaster.Salary / 335);
+                        leaveSalary.Id = 0;
                         leaveSalary.PaidAmt = 0;
-                        leaveSalary.Year    = attendance.date.Substring(0,4);
+                        leaveSalary.Year = attendance.date.Substring(0, 4);
                         leaveSalary.PendingAmt = leaveSalary.PayAmt;
                         leaveSalary.EditBy = attendance.EditBy;
                         leaveSalary.EditDate = attendance.EditDate;
@@ -230,12 +230,13 @@ namespace DockerSqlServer.Controllers
                 }
                 return false;
             }
-            catch (Exception e) {
+            catch (Exception e)
+            {
 
                 var m = e;
             }
-                return true;
-  
+            return true;
+
         }
 
         [HttpPost]
@@ -381,7 +382,7 @@ namespace DockerSqlServer.Controllers
                     salaryPayable.Novt = attendance.Novt * salaryMaster.NOtr;
                     salaryPayable.Sovt = attendance.Sovt * salaryMaster.SOtr;
                     salaryPayable.Overseas = attendance.Overseas * salaryMaster.Overseas;
-                    salaryPayable.due = salarypaid != null ? salarypaid.Due??0:0;
+                    salaryPayable.due = salarypaid != null ? salarypaid.Due ?? 0 : 0;
                     decimal[] numbers = { salaryPayable.due, salaryPayable.Overseas, salaryPayable.Sovt, salaryPayable.Novt,
                                          salaryPayable.Basic , salaryPayable.Attendance, salaryPayable.Anchorage };
                     salaryPayable.Total = numbers.Sum();
@@ -410,15 +411,15 @@ namespace DockerSqlServer.Controllers
         public async Task<List<SalaryPay>> getSalaryPay(String date)
         {
 
-                string StoredProc = "select sa.id,sa.date,sa.empcode,name,basic,attendance,novt,sovt,overseas,anchorage,sa.due,total, " +
-                                    "sa.editDt,sa.creatDt from hr.salaryPayable sa " +
-                                    "inner join hr.empMaster emp on emp.empCode = sa.empcode " +
-                                    "where sa.date = '" + date + "'";
+            string StoredProc = "select sa.id,sa.date,sa.empcode,name,basic,attendance,novt,sovt,overseas,anchorage,sa.due,total, " +
+                                "sa.editDt,sa.creatDt from hr.salaryPayable sa " +
+                                "inner join hr.empMaster emp on emp.empCode = sa.empcode " +
+                                "where sa.date = '" + date + "'";
 
-                var t = await _db.SalaryPay.FromSqlRaw(StoredProc).ToListAsync();
+            var t = await _db.SalaryPay.FromSqlRaw(StoredProc).ToListAsync();
 
-                return t;
- 
+            return t;
+
         }
 
         [HttpGet]
@@ -464,37 +465,37 @@ namespace DockerSqlServer.Controllers
         {
             try
             {
-                    int rowsAffected = 0;
+                int rowsAffected = 0;
 
-                    salaryPaid.EditDt = DateTime.Now;
-                    salaryPaid.CreatDt = DateTime.Now;
+                salaryPaid.EditDt = DateTime.Now;
+                salaryPaid.CreatDt = DateTime.Now;
 
                 //    var existingEntity = await _db.SalaryPaid.Where(e => e.Date == salaryPaid.Date & e.EmpCode == salaryPaid.EmpCode & e.Type == salaryPaid.Type).FirstOrDefaultAsync();
 
                 //if (existingEntity == null)
                 //    {
 
-                        _db.SalaryPaid.Add(salaryPaid);
-                        rowsAffected = await _db.SaveChangesAsync();
+                _db.SalaryPaid.Add(salaryPaid);
+                rowsAffected = await _db.SaveChangesAsync();
 
-                    //}
-                    //else
-                    //{
+                //}
+                //else
+                //{
 
-                    //    existingEntity.EmpCode = salaryPaid.EmpCode;
-                    //    existingEntity.Payable = salaryPaid.Payable;
-                    //    existingEntity.Type = salaryPaid.Type;
-                    //    existingEntity.Totalpaid += salaryPaid.Totalpaid;
-                    //    existingEntity.PaidDt = salaryPaid.PaidDt;
-                    //    existingEntity.Due = salaryPaid.Due;
-                    //    existingEntity.Date = salaryPaid.Date;
-                    //    existingEntity.PaidBy = salaryPaid.PaidBy;
-                    //    existingEntity.Paid = salaryPaid.Paid;
-                    //    existingEntity.EditBy = salaryPaid.EditBy;
+                //    existingEntity.EmpCode = salaryPaid.EmpCode;
+                //    existingEntity.Payable = salaryPaid.Payable;
+                //    existingEntity.Type = salaryPaid.Type;
+                //    existingEntity.Totalpaid += salaryPaid.Totalpaid;
+                //    existingEntity.PaidDt = salaryPaid.PaidDt;
+                //    existingEntity.Due = salaryPaid.Due;
+                //    existingEntity.Date = salaryPaid.Date;
+                //    existingEntity.PaidBy = salaryPaid.PaidBy;
+                //    existingEntity.Paid = salaryPaid.Paid;
+                //    existingEntity.EditBy = salaryPaid.EditBy;
 
-                    //    _db.SalaryPaid.Update(existingEntity);
-                    //    rowsAffected = await _db.SaveChangesAsync();
-                    //}
+                //    _db.SalaryPaid.Update(existingEntity);
+                //    rowsAffected = await _db.SaveChangesAsync();
+                //}
 
                 if (salaryPaid.Type == 1)
                 {
@@ -505,7 +506,8 @@ namespace DockerSqlServer.Controllers
                     rowsAffected = await _db.SaveChangesAsync();
 
                 }
-                else {
+                else
+                {
 
                     var existingLeaveSalary = await _db.LeaveSalary.Where(e => e.Year == salaryPaid.Date.Substring(0, 4) & e.EmpCode == salaryPaid.EmpCode).FirstOrDefaultAsync();
                     existingLeaveSalary.PaidAmt += salaryPaid.Totalpaid;
@@ -516,10 +518,10 @@ namespace DockerSqlServer.Controllers
                 }
 
                 if (rowsAffected > 0)
-                    {
-                        return true;
-                    }
-                    return false;
+                {
+                    return true;
+                }
+                return false;
             }
             catch (Exception ex)
             {
@@ -538,40 +540,38 @@ namespace DockerSqlServer.Controllers
                 int rowsAffected = 0;
 
 
-                    var existingEntity = await _db.QuotationDetail.FindAsync(quotationDetail.Id);
+                var existingEntity = await _db.QuotationDetail.FindAsync(quotationDetail.Id);
 
-                    if (existingEntity == null)
-                    {
-                        quotationDetail.EditDt = DateTime.Now;
-                        quotationDetail.CreatDt = DateTime.Now;
-
-
-                        _db.QuotationDetail.Add(quotationDetail);
-                        rowsAffected = await _db.SaveChangesAsync();
-
-                    }
-                    else
-                    {
-
-                        existingEntity.ClientName = quotationDetail.ClientName;
-                        existingEntity.Narration = quotationDetail.Narration;
-                        existingEntity.Name = quotationDetail.Name;
-                        existingEntity.Date = quotationDetail.Date;
-                        existingEntity.DueDate = quotationDetail.DueDate;
-                        existingEntity.PoStatus = quotationDetail.PoStatus;
-                        existingEntity.Type = quotationDetail.Type;
-                        existingEntity.DocId = quotationDetail.DocId;
-                        existingEntity.InvStatus = quotationDetail.InvStatus;
-                        existingEntity.QuotationNo = quotationDetail.QuotationNo;
-                        existingEntity.InvoiceNo = quotationDetail.InvoiceNo;
-                        existingEntity.EditDt = quotationDetail.EditDt;
-                        existingEntity.EditBy = quotationDetail.EditBy;
+                if (existingEntity == null)
+                {
+                    quotationDetail.EditDt = DateTime.Now;
+                    quotationDetail.CreatDt = DateTime.Now;
 
 
-                        _db.QuotationDetail.Update(existingEntity);
-                        rowsAffected = await _db.SaveChangesAsync();
-                    }
-                
+                    _db.QuotationDetail.Add(quotationDetail);
+                    rowsAffected = await _db.SaveChangesAsync();
+
+                }
+                else
+                {
+
+                    existingEntity.ClientId = quotationDetail.ClientId;
+                    existingEntity.Narration = quotationDetail.Narration;
+                    existingEntity.Name = quotationDetail.Name;
+                    existingEntity.Date = quotationDetail.Date;
+                    existingEntity.DueDate = quotationDetail.DueDate;
+                    existingEntity.PoStatus = quotationDetail.PoStatus;
+                    existingEntity.Type = quotationDetail.Type;
+                    existingEntity.InvStatus = quotationDetail.InvStatus;
+                    existingEntity.InvoiceNo = quotationDetail.InvoiceNo;
+                    existingEntity.EditDt = quotationDetail.EditDt;
+                    existingEntity.EditBy = quotationDetail.EditBy;
+
+
+                    _db.QuotationDetail.Update(existingEntity);
+                    rowsAffected = await _db.SaveChangesAsync();
+                }
+
                 if (rowsAffected > 0)
                 {
                     return true;
@@ -587,17 +587,18 @@ namespace DockerSqlServer.Controllers
 
         [HttpGet]
         [Route("getQuotationDetails")]
-        public async Task<List<QuotationDetailDto>> getQuotationDetails(String clientName, String name,String poStatus,String invStatus, String type)
+        public async Task<List<QuotationDetailDto>> getQuotationDetails(String clientName, String name, String poStatus, String invStatus, String type)
         {
 
-            string StoredProc = "select quo.id,clientName,narration,name,date,quotationNo,invoiceNo,"+
-                                "pos.[description] poStatus,ins.[description] invStatus,qut.[description] type,docid,dueDate,editDt,creatDt,"+
+            string StoredProc = "select quo.id,cld.name ClientName,narration,quo.name,date,invoiceNo,poNo,poRefNo,reportNo,invoiceAmt," +
+                                "pos.[description] poStatus,ins.[description] invStatus,qut.[description] type,dueDate,quo.editDt,quo.creatDt," +
                                 "(select name from[hr].[user] where userCd = quo.editBy) editBy," +
                                 "(select name from[hr].[user] where userCd = ISNULL(quo.creatby, 1)) creatBy from hr.quotationDetails quo " +
                                 "INNER JOIN  hr.poStatus pos on pos.id = quo.poStatus " +
+                                "INNER JOIN hr.clientDetails cld on cld.id = quo.clientId " +
                                 "INNER JOIN  hr.invStatus ins on ins.id = quo.invStatus " +
                                 "INNER JOIN hr.quotationType qut on qut.id = quo.[type] " +
-                                "where clientName Like '%" + clientName + "%' and name Like '%" + name + "%' " +
+                                "where cld.name Like '%" + clientName + "%' and quo.name Like '%" + name + "%' " +
                                 "and poStatus Like '%" + poStatus + "%' and invStatus Like '%" + invStatus + "%' and type Like '%" + type + "%'";
 
             var t = await _db.QuotationDetailDto.FromSqlRaw(StoredProc).ToListAsync();

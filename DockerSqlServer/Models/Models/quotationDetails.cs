@@ -9,16 +9,18 @@ namespace DockerSqlServer.Models
     {
         [Key]
         public int Id { get; set; }
-        public string ClientName { get; set; }
+        public int ClientId { get; set; }
         public string Narration { get; set; }
         public string Name { get; set; }
         public string Date { get; set; }
-        public int QuotationNo { get; set; }
         public int InvoiceNo { get; set; }
+        public int PoNo { get; set; }
+        public decimal InvoiceAmt { get; set; }
+        public int PoRefNo { get; set; }
+        public int ReportNo { get; set; }
         public byte PoStatus { get; set; }
         public byte InvStatus { get; set; }
         public byte Type { get; set; }
-        public byte DocId { get; set; }
         public string DueDate { get; set; }
         public short EditBy { get; set; }
         public DateTime EditDt { get; set; }
