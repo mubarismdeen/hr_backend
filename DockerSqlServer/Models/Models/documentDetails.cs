@@ -14,6 +14,7 @@ namespace DockerSqlServer.Models
         public Byte docid { get; set; }
         public DateTime? dueDate { get; set; }
         public DateTime? renewedDate { get; set; }
+        public byte Status { get; set; }
         public Int16? creatBy { get; set; }
         public DateTime? creatDt { get; set; }
         public Int16? EditBy { get; set; }

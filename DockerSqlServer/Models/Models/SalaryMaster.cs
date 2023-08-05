@@ -81,6 +81,9 @@ namespace DockerSqlServer.Models
         [Required]
         [Column(TypeName = "decimal(8,2)")]
         public decimal Anchorage { get; set; }
+        
+        [Required]
+        public byte Status { get; set; }
 
         [Required]
         public short EditBy { get; set; }

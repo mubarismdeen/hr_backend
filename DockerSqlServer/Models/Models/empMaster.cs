@@ -4,9 +4,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DockerSqlServer.Models
 {
-        [Table("empMaster", Schema ="hr")]
-        public class EmpMaster
-        {
+    [Table("empMaster", Schema = "hr")]
+    public class EmpMaster
+    {
             [Key]
             [Column("id")]
             [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -17,6 +17,9 @@ namespace DockerSqlServer.Models
 
             [Column("name")]
             public string Name { get; set; }
+            
+            [Column("status")]
+            public byte Status { get; set; }
 
             [Column("mobile1")]
             public string Mobile1 { get; set; }
@@ -50,5 +53,5 @@ namespace DockerSqlServer.Models
 
             [Column("creatDate")]
             public DateTime CreatDate { get; set; }
-        }
+    }
 }

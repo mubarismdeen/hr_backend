@@ -109,10 +109,37 @@ namespace DockerSqlServer.Controllers
         }
 
         [HttpGet]
+        [Route("authorizeUser")]
+        public async Task<ActionResult<List<UserScreens>>> authorizeUser(String userName, String password)
+        {
+            string StoredProc = "select scr.* from [hr].[user] u inner join [hr].[userScreens] scr on u.userCd = scr.userId where u.name = '" + userName + "' and u.password = '" + password + "'";
+
+            var t = await _db.UserScreens.FromSqlRaw(StoredProc).ToListAsync();
+
+            return t;
+
+        }
+
+        [HttpGet]
+        [Route("getPrivilegesForUser")]
+        public async Task<ActionResult<List<UserPrivileges>>> getPrivilegesForUser(String userName, String privilege)
+        {
+            string StoredProc = "select priv.* from [hr].[user] u inner join [hr].[userPrivileges] priv on u.userCd = priv.userId where u.name = '" + userName + "' and priv.privilegeName = '" + privilege + "'";
+
+            var t = await _db.UserPrivileges.FromSqlRaw(StoredProc).ToListAsync();
+
+            return t;
+
+        }
+
+        [HttpGet]
         [Route("getDocDetails")]
         public async Task<ActionResult<List<docScreenDetails>>> getDocDetails()
         {
-            string StoredProc = "select docd.id,ISNULL(narration,'Nil') narration,emp.name,doct.description docType,dueDate,renewedDate,(select name from hr.[user] where  id = docd.editBy)editBy,editdt,(select name from hr.[user] where  id = docd.creatBy)creatBy,creatDt  from [hr].[documentDetails] docd left join hr.documentType doct on doct.id = docd.docid inner join hr.empMaster emp on emp.id = docd.empCode and emp.statusId = 1 order by dueDate";
+            string StoredProc = "select docd.id,ISNULL(narration,'Nil') narration,emp.name,doct.description docType,dueDate,renewedDate," +
+                "(select name from hr.[user] where  id = docd.editBy)editBy,editdt,(select name from hr.[user] where  id = docd.creatBy)creatBy,creatDt " +
+                " from [hr].[documentDetails] docd left join hr.documentType doct on doct.id = docd.docid " +
+                "inner join hr.empMaster emp on emp.id = docd.empCode and emp.statusId = 1 where docd.Status != 2 order by dueDate";
 
             var t = await _db.docScreenDetails.FromSqlRaw(StoredProc).ToListAsync();
 
@@ -124,14 +151,101 @@ namespace DockerSqlServer.Controllers
         [Route("saveDocDetails")]
         public async Task<ActionResult<bool>> saveDocDetails(DocumentDetails docDetails)
         {
-            _db.DocumentDetails.Add(docDetails);
-            var rowsAffected = await _db.SaveChangesAsync();
+            //_db.DocumentDetails.Add(docDetails);
+            //var rowsAffected = await _db.SaveChangesAsync();
 
-            if (rowsAffected > 0)
+            //if (rowsAffected > 0)
+            //{
+            //    return true;
+            //}
+            //return false;
+
+
+            try
             {
-                return true;
+
+                int rowsAffected = 0;
+
+
+                var existingEntity = await _db.DocumentDetails.FindAsync(docDetails.Id);
+
+                if (existingEntity == null)
+                {
+                    docDetails.EditDt = DateTime.Now;
+                    docDetails.creatDt = DateTime.Now;
+
+
+                    _db.DocumentDetails.Add(docDetails);
+                    rowsAffected = await _db.SaveChangesAsync();
+
+                }
+                else
+                {
+
+                    existingEntity.empCode = docDetails.empCode;
+                    existingEntity.narration = docDetails.narration;
+                    existingEntity.renewedDate = docDetails.renewedDate;
+                    existingEntity.docid = docDetails.docid;
+                    existingEntity.dueDate = docDetails.dueDate;
+                    existingEntity.EditDt = docDetails.EditDt;
+                    existingEntity.EditBy = docDetails.EditBy;
+                    existingEntity.Status = docDetails.Status;
+
+
+                    _db.DocumentDetails.Update(existingEntity);
+                    rowsAffected = await _db.SaveChangesAsync();
+                }
+
+                if (rowsAffected > 0)
+                {
+                    return true;
+                }
+                return false;
             }
-            return false;
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
+        [HttpGet]
+        [Route("DeleteDocDetails")]
+        public async Task<ActionResult<bool>> DeleteDocDetails(int id)
+        {
+
+            try
+            {
+
+                int rowsAffected = 0;
+
+
+                var existingEntity = await _db.DocumentDetails.FindAsync(id);
+
+                if (existingEntity == null)
+                {
+                    return false;
+
+                }
+                else
+                {
+
+                    existingEntity.Status = 2;
+
+
+                    _db.DocumentDetails.Update(existingEntity);
+                    rowsAffected = await _db.SaveChangesAsync();
+                }
+
+                if (rowsAffected > 0)
+                {
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
         }
 
         [HttpGet]
@@ -151,24 +265,64 @@ namespace DockerSqlServer.Controllers
         [Route("saveSalary")]
         public async Task<ActionResult<bool>> saveSalary(Salary salary)
         {
-            //if (!ModelState.IsValid)
+
+            //_db.Salary.Add(salary);
+            //var rowsAffected = await _db.SaveChangesAsync();
+
+            //if (rowsAffected > 0)
             //{
-            //    return BadRequest(ModelState);
+            //    return true;
             //}
+            //return false;
 
-            //salary.EditBy = 1; // Set the user ID for the editBy column
-            //salary.EditDt = DateTime.Now; // Set the current date and time for the editDt column
-            //salary.CreatBy = 1; // Set the user ID for the creatBy column
-            //salary.CreatDt = DateTime.Now; // Set the current date and time for the creatDt column
-
-            _db.Salary.Add(salary);
-            var rowsAffected = await _db.SaveChangesAsync();
-
-            if (rowsAffected > 0)
+            try
             {
-                return true;
+
+                int rowsAffected = 0;
+
+
+                var existingEntity = await _db.Salary.FindAsync(salary.Id);
+
+                if (existingEntity == null)
+                {
+                    salary.EditDt = DateTime.Now;
+                    salary.CreatDt = DateTime.Now;
+
+
+                    _db.Salary.Add(salary);
+                    rowsAffected = await _db.SaveChangesAsync();
+
+                }
+                else
+                {
+
+                    existingEntity.EmpCode = salary.EmpCode;
+                    existingEntity.attendance = salary.attendance;
+                    existingEntity.Anchorage = salary.Anchorage;
+                    existingEntity.molId = salary.molId;
+                    existingEntity.Novt = salary.Novt;
+                    existingEntity.OffDays = salary.OffDays;
+                    existingEntity.Overseas = salary.Overseas;
+                    existingEntity.salary = salary.salary;
+                    existingEntity.Sovt = salary.Sovt;
+                    existingEntity.EditDt = salary.EditDt;
+                    existingEntity.EditBy = salary.EditBy;
+
+
+                    _db.Salary.Update(existingEntity);
+                    rowsAffected = await _db.SaveChangesAsync();
+                }
+
+                if (rowsAffected > 0)
+                {
+                    return true;
+                }
+                return false;
             }
-            return false;
+            catch (Exception ex)
+            {
+                return false;
+            }
         }
 
         [HttpPost]
@@ -241,16 +395,63 @@ namespace DockerSqlServer.Controllers
 
         [HttpPost]
         [Route("saveSalaryMaster")]
-        public async Task<ActionResult<bool>> saveSalaryMaster(SalaryMaster SalaryMaster)
+        public async Task<ActionResult<bool>> saveSalaryMaster(SalaryMaster salaryMaster)
         {
-            _db.SalaryMaster.Add(SalaryMaster);
-            var rowsAffected = await _db.SaveChangesAsync();
+            //_db.SalaryMaster.Add(SalaryMaster);
+            //var rowsAffected = await _db.SaveChangesAsync();
 
-            if (rowsAffected > 0)
+            //if (rowsAffected > 0)
+            //{
+            //    return true;
+            //}
+            //return false;
+
+            try
             {
-                return true;
+
+                int rowsAffected = 0;
+                salaryMaster.EditDt = DateTime.Now;
+
+
+                var existingEntity = await _db.SalaryMaster.FindAsync(salaryMaster.Id);
+
+                if (existingEntity == null)
+                {
+                    salaryMaster.CreatDt = DateTime.Now;
+
+
+                    _db.SalaryMaster.Add(salaryMaster);
+                    rowsAffected = await _db.SaveChangesAsync();
+
+                }
+                else
+                {
+
+                    existingEntity.EmpCode = salaryMaster.EmpCode;
+                    existingEntity.Overseas = salaryMaster.Overseas;
+                    existingEntity.Anchorage = salaryMaster.Anchorage;
+                    existingEntity.NOtr = salaryMaster.NOtr;
+                    existingEntity.SOtr = salaryMaster.SOtr;
+                    existingEntity.Overseas = salaryMaster.Overseas;
+                    existingEntity.Salary = salaryMaster.Salary;
+                    existingEntity.EditDt = salaryMaster.EditDt;
+                    existingEntity.EditBy = salaryMaster.EditBy;
+                    existingEntity.Status = salaryMaster.Status;
+
+                    _db.SalaryMaster.Update(existingEntity);
+                    rowsAffected = await _db.SaveChangesAsync();
+                }
+
+                if (rowsAffected > 0)
+                {
+                    return true;
+                }
+                return false;
             }
-            return false;
+            catch (Exception ex)
+            {
+                return false;
+            }
         }
 
         [HttpPost]
@@ -315,7 +516,7 @@ namespace DockerSqlServer.Controllers
         [Route("getEmpDetails")]
         public async Task<ActionResult<List<EmpMaster>>> getEmpDetails()
         {
-            string StoredProc = "select * from hr.empMaster where statusId = 1 ";
+            string StoredProc = "select * from hr.empMaster where statusId = 1 and status != 2 ";
 
             var t = await _db.EmpMaster.FromSqlRaw(StoredProc).ToListAsync();
 
@@ -449,7 +650,7 @@ namespace DockerSqlServer.Controllers
                                 "(select name from[hr].[user] where userCd = sm.creatby) creatBy " +
                                 "from hr.salaryMaster sm " +
                                 "INNER join hr.empMaster em on em.empCode = sm.empCode " +
-                                "where em.statusId = 1 ";
+                                "where em.statusId = 1 and sm.Status != 2";
 
             var t = await _db.SalaryMasterDto.FromSqlRaw(StoredProc).ToListAsync();
 
@@ -458,6 +659,45 @@ namespace DockerSqlServer.Controllers
         }
 
 
+        [HttpGet]
+        [Route("DeleteSalaryMaster")]
+        public async Task<ActionResult<bool>> DeleteSalaryMaster(int id)
+        {
+
+            try
+            {
+
+                int rowsAffected = 0;
+
+
+                var existingEntity = await _db.SalaryMaster.FindAsync(id);
+
+                if (existingEntity == null)
+                {
+                    return false;
+
+                }
+                else
+                {
+
+                    existingEntity.Status = 2;
+
+
+                    _db.SalaryMaster.Update(existingEntity);
+                    rowsAffected = await _db.SaveChangesAsync();
+                }
+
+                if (rowsAffected > 0)
+                {
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
 
         [HttpPost]
         [Route("saveSalaryPaid")]
@@ -506,13 +746,22 @@ namespace DockerSqlServer.Controllers
                     rowsAffected = await _db.SaveChangesAsync();
 
                 }
-                else
+                else if (salaryPaid.Type == 2)
                 {
 
                     var existingLeaveSalary = await _db.LeaveSalary.Where(e => e.Year == salaryPaid.Date.Substring(0, 4) & e.EmpCode == salaryPaid.EmpCode).FirstOrDefaultAsync();
                     existingLeaveSalary.PaidAmt += salaryPaid.Totalpaid;
                     existingLeaveSalary.PendingAmt = salaryPaid.Payable - salaryPaid.Totalpaid;
                     _db.LeaveSalary.Update(existingLeaveSalary);
+                    rowsAffected = await _db.SaveChangesAsync();
+
+                }
+                else
+                {
+
+                    var existingGratuity = await _db.Gratuity.Where(e => e.EmpCode == salaryPaid.EmpCode).FirstOrDefaultAsync();
+                    existingGratuity.Paid = true;
+                    _db.Gratuity.Update(existingGratuity);
                     rowsAffected = await _db.SaveChangesAsync();
 
                 }
@@ -564,8 +813,53 @@ namespace DockerSqlServer.Controllers
                     existingEntity.Type = quotationDetail.Type;
                     existingEntity.InvStatus = quotationDetail.InvStatus;
                     existingEntity.InvoiceNo = quotationDetail.InvoiceNo;
+                    existingEntity.InvoiceAmt = quotationDetail.InvoiceAmt;
+                    existingEntity.ReportNo = quotationDetail.ReportNo;
+                    existingEntity.PoNo = quotationDetail.PoNo;
+                    existingEntity.PoRefNo = quotationDetail.PoRefNo;
                     existingEntity.EditDt = quotationDetail.EditDt;
                     existingEntity.EditBy = quotationDetail.EditBy;
+                    existingEntity.Status = quotationDetail.Status;
+
+
+                    _db.QuotationDetail.Update(existingEntity);
+                    rowsAffected = await _db.SaveChangesAsync();
+                }
+
+                if (rowsAffected > 0)
+                {
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
+        [HttpGet]
+        [Route("DeleteQuotationDetails")]
+        public async Task<ActionResult<bool>> DeleteQuotationDetails(int id)
+        {
+
+            try
+            {
+
+                int rowsAffected = 0;
+
+
+                var existingEntity = await _db.QuotationDetail.FindAsync(id);
+
+                if (existingEntity == null)
+                {
+                    return false;
+
+                }
+                else
+                {
+
+                    existingEntity.Status = 2;
 
 
                     _db.QuotationDetail.Update(existingEntity);
@@ -598,7 +892,7 @@ namespace DockerSqlServer.Controllers
                                 "INNER JOIN hr.clientDetails cld on cld.id = quo.clientId " +
                                 "INNER JOIN  hr.invStatus ins on ins.id = quo.invStatus " +
                                 "INNER JOIN hr.quotationType qut on qut.id = quo.[type] " +
-                                "where cld.name Like '%" + clientName + "%' and quo.name Like '%" + name + "%' " +
+                                "where cld.name Like '%" + clientName + "%' and quo.name Like '%" + name + "%' and quo.Status != 2" +
                                 "and poStatus Like '%" + poStatus + "%' and invStatus Like '%" + invStatus + "%' and type Like '%" + type + "%'";
 
             var t = await _db.QuotationDetailDto.FromSqlRaw(StoredProc).ToListAsync();
@@ -612,14 +906,15 @@ namespace DockerSqlServer.Controllers
         public async Task<List<EmployeeDetailsDto>> getEmployeeDetails()
         {
 
-            string StoredProc = "SELECT emp.empCode, emp.name, emp.mobile1, emp.mobile2, dep.[description] department, " +
+            string StoredProc = "SELECT emp.id, emp.empCode, emp.name, emp.mobile1, emp.mobile2, dep.[description] department, " +
                                 "stat.[description] status, nat.[description] nationality, emp.birthDt, emp.joinDt, " +
                                 "editEmp.[name] editBy, emp.[editDate] editDt, createEmp.[name] createBy, emp.[creatDate] createDt " +
                                 "FROM hr.empMaster emp INNER JOIN hr.departmentMaster dep on dep.id = emp.depId " +
                                 "INNER JOIN hr.statusMaster stat on stat.id = emp.statusId " +
                                 "INNER JOIN hr.nationalityMaster nat on nat.id = emp.natianalityId " +
                                 "INNER JOIN hr.empMaster editEmp on editEmp.id = emp.editBy " +
-                                "INNER JOIN hr.empMaster createEmp on createEmp.id = emp.creatBy ";
+                                "INNER JOIN hr.empMaster createEmp on createEmp.id = emp.creatBy " +
+                                "WHERE emp.status != 2";
 
             var t = await _db.EmployeeDetailsDto.FromSqlRaw(StoredProc).ToListAsync();
 
@@ -685,18 +980,59 @@ namespace DockerSqlServer.Controllers
         {
 
             string StoredProc = "select jod.id,Job,narration,assignedDate,dueDate,stm.[description] jobStatus,editDt,creatDt ," +
-                                "(select name from[hr].[user] where userCd = jod.assignedTo) assignedTo," +
+                                "(select name from[hr].[empMaster] where empCode = jod.assignedTo) assignedTo," +
                                 "(select name from[hr].[user] where userCd = jod.editBy) editBy," +
                                 "(select name from[hr].[user] where userCd = ISNULL(jod.creatby,1)) creatBy " +
                                 "from hr.jobDetails jod " +
                                 "INNER JOIN hr.statusMaster stm on stm.id = jod.jobStatus " +
                                 "where JobStatus Like '%" + JobStatus + "%' and AssignedTo Like '%" + AssignedTo + "%' " +
-                                "and DueDate Like '%" + DueDate + "'";
+                                "and DueDate Like '%" + DueDate + "' and Status != 2";
 
             var t = await _db.jobDetailDto.FromSqlRaw(StoredProc).ToListAsync();
 
             return t;
 
+        }
+
+
+        [HttpGet]
+        [Route("DeleteJobDetails")]
+        public async Task<ActionResult<bool>> DeleteJobDetails(int id)
+        {
+
+            try
+            {
+
+                int rowsAffected = 0;
+
+
+                var existingEntity = await _db.jobDetail.FindAsync(id);
+
+                if (existingEntity == null)
+                {
+                    return false;
+
+                }
+                else
+                {
+
+                    existingEntity.Status = 2;
+
+
+                    _db.jobDetail.Update(existingEntity);
+                    rowsAffected = await _db.SaveChangesAsync();
+                }
+
+                if (rowsAffected > 0)
+                {
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
         }
 
         [HttpGet]
@@ -785,6 +1121,18 @@ namespace DockerSqlServer.Controllers
 
         }
 
+        [HttpGet]
+        [Route("getGratuityType")]
+        public async Task<ActionResult<List<DocType>>> getGratuityType()
+        {
+            string StoredProc = "select * from hr.gratuityType";
+
+            var t = await _db.DocType.FromSqlRaw(StoredProc).ToListAsync();
+
+            return t;
+
+        }
+
         [HttpPost]
         [Route("saveEmployeeDetails")]
         public async Task<ActionResult<bool>> saveEmployeeDetails(EmpMaster empMaster)
@@ -794,13 +1142,13 @@ namespace DockerSqlServer.Controllers
             {
 
                 int rowsAffected = 0;
+                empMaster.EditDate = DateTime.Now;
 
 
                 var existingEntity = await _db.EmpMaster.FindAsync(empMaster.Id);
 
                 if (existingEntity == null)
                 {
-                    empMaster.EditDate = DateTime.Now;
                     empMaster.CreatDate = DateTime.Now;
 
 
@@ -822,6 +1170,47 @@ namespace DockerSqlServer.Controllers
                     existingEntity.BirthDt = empMaster.BirthDt;
                     existingEntity.EditBy = empMaster.EditBy;
                     existingEntity.EditDate = empMaster.EditDate;
+                    existingEntity.Status = empMaster.Status;
+
+
+                    _db.EmpMaster.Update(existingEntity);
+                    rowsAffected = await _db.SaveChangesAsync();
+                }
+
+                if (rowsAffected > 0)
+                {
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
+        [HttpGet]
+        [Route("DeleteEmployeeDetails")]
+        public async Task<ActionResult<bool>> DeleteEmployeeDetails(int id)
+        {
+
+            try
+            {
+
+                int rowsAffected = 0;
+
+
+                var existingEntity = await _db.EmpMaster.FindAsync(id);
+
+                if (existingEntity == null)
+                {
+                    return false;
+
+                }
+                else
+                {
+
+                    existingEntity.Status = 2;
 
 
                     _db.EmpMaster.Update(existingEntity);
@@ -844,7 +1233,7 @@ namespace DockerSqlServer.Controllers
         [Route("getClientDetails")]
         public async Task<ActionResult<List<ClientDetails>>> getClientDetails()
         {
-            string StoredProc = "select * from hr.clientDetails";
+            string StoredProc = "select * from hr.clientDetails where status != 2";
 
             var t = await _db.ClientDetails.FromSqlRaw(StoredProc).ToListAsync();
 
@@ -877,6 +1266,7 @@ namespace DockerSqlServer.Controllers
                     existingEntity.Mobile2 = clientDetails.Mobile2;
                     existingEntity.EditBy = clientDetails.EditBy;
                     existingEntity.EditDt = clientDetails.EditDt;
+                    existingEntity.Status = clientDetails.Status;
                     _db.ClientDetails.Update(existingEntity);
                     rowsAffected = await _db.SaveChangesAsync();
                 }
@@ -891,6 +1281,183 @@ namespace DockerSqlServer.Controllers
                 return false;
             }
         }
+
+        [HttpGet]
+        [Route("DeleteClientDetails")]
+        public async Task<ActionResult<bool>> DeleteClientDetails(int id)
+        {
+
+            try
+            {
+
+                int rowsAffected = 0;
+
+
+                var existingEntity = await _db.ClientDetails.FindAsync(id);
+
+                if (existingEntity == null)
+                {
+                    return false;
+
+                }
+                else
+                {
+
+                    existingEntity.Status = 2;
+
+
+                    _db.ClientDetails.Update(existingEntity);
+                    rowsAffected = await _db.SaveChangesAsync();
+                }
+
+                if (rowsAffected > 0)
+                {
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
+        [HttpGet]
+        [Route("SaveGratuity")]
+        public async Task<ActionResult<bool>> SaveGratuity(short empCode, byte type, short editBy)
+        {
+
+            Gratuity gratuity = new();
+
+            try
+            {
+                int rowsAffected = 0;
+
+                string StoredProc = "select sum(attendance + offdays) ServedDays from hr.attendance where empCode = '" + empCode + "'";
+
+                var salaryMaster = await _db.SalaryMaster.Where(e => e.EmpCode == empCode).FirstOrDefaultAsync();
+
+                var ServedDays = await _db.ServedDaysDto.FromSqlRaw(StoredProc).ToListAsync();
+
+                gratuity.EmpCode = empCode;
+                gratuity.ServedYears = ServedDays[0].ServedDays / 360;
+                gratuity.Type = type;
+                gratuity.EditBy = editBy;
+                gratuity.CreatBy = editBy;
+                gratuity.EditDate = DateTime.Now;
+                gratuity.CreatDate = DateTime.Now;
+                gratuity.Paid = false;
+
+                //decimal DaySalary = salaryMaster.Salary / 21;
+                decimal dailySalary = salaryMaster.Salary / ServedDays[0].ServedDays;
+                decimal twentyOneDaySalary = dailySalary * 21;
+
+                if (type == 1)
+                {
+                    if (gratuity.ServedYears > 1 & gratuity.ServedYears < 5)
+                    {
+
+                        gratuity.GratuityAmt = twentyOneDaySalary * gratuity.ServedYears;
+
+                    }
+                    else if (gratuity.ServedYears > 5)
+                    {
+
+                        gratuity.GratuityAmt = twentyOneDaySalary * 2;
+
+                        gratuity.GratuityAmt = gratuity.GratuityAmt + ((dailySalary * 30) * gratuity.ServedYears - 5);
+
+                    }
+                }
+                else if (type == 2)
+                {
+                    if (gratuity.ServedYears > 1 & gratuity.ServedYears < 5)
+                    {
+
+                        gratuity.GratuityAmt = twentyOneDaySalary * gratuity.ServedYears;
+
+                    }
+                    else if (gratuity.ServedYears > 5)
+                    {
+
+                        gratuity.GratuityAmt = twentyOneDaySalary * 2;
+
+                        gratuity.GratuityAmt = gratuity.GratuityAmt + ((dailySalary * 30) * gratuity.ServedYears - 5);
+
+                    }
+                }
+                else if (type == 3)
+                {
+                    if (gratuity.ServedYears > 1 & gratuity.ServedYears < 3)
+                    {
+
+                        gratuity.GratuityAmt = twentyOneDaySalary / 3;
+
+                    }
+                    else if (gratuity.ServedYears > 3 & gratuity.ServedYears < 5)
+                    {
+
+                        gratuity.GratuityAmt = twentyOneDaySalary * (2 / 3);
+
+                    }
+                    else if (gratuity.ServedYears > 5)
+                    {
+                        gratuity.GratuityAmt = twentyOneDaySalary;
+
+                    }
+
+                }
+
+                var existingEntity = await _db.Gratuity.Where(e => e.EmpCode == empCode).FirstOrDefaultAsync();
+
+                if (existingEntity != null)
+                {
+
+                    existingEntity.EditDate = DateTime.Now;
+                    existingEntity.EditBy = editBy;
+                    existingEntity.Type = type;
+                    existingEntity.GratuityAmt = gratuity.GratuityAmt;
+                    existingEntity.ServedYears = gratuity.ServedYears;
+                    _db.Gratuity.Update(existingEntity);
+                    rowsAffected = await _db.SaveChangesAsync();
+                }
+                else
+                {
+                    _db.Gratuity.Add(gratuity);
+                    rowsAffected = await _db.SaveChangesAsync();
+                }
+
+
+                if (rowsAffected > 0)
+                {
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
+
+        [HttpGet]
+        [Route("getGratuityDetails")]
+        public async Task<List<GratuityDetailsDto>> getGratuityDetails()
+        {
+
+            string StoredProc = "select grt.id,grt.empCode,emp.name,servedYears,gtp.description type,gratuityAmt,grt.editDate,Paid," +
+                                "grt.creatDate,(select name from [hr].[user] where userCd = grt.editBy) editBy," +
+                                "(select name from [hr].[user] where userCd = grt.creatby) creatBy from [hr].[gratuity] grt  " +
+                                "inner join hr.empMaster emp on emp.empCode = grt.empcode " +
+                                "inner join hr.gratuityType gtp on gtp.id = grt.type";
+
+            var t = await _db.GratuityDetailsDto.FromSqlRaw(StoredProc).ToListAsync();
+
+            return t;
+
+        }
+
 
 
     }

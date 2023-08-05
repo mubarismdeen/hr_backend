@@ -15,6 +15,9 @@ namespace DockerSqlServer.Models
             [Column("name")]
             public string Name { get; set; }
 
+            [Column("status")]
+            public byte Status { get; set; }
+
             [Column("address")]
             public string Address { get; set; }
 

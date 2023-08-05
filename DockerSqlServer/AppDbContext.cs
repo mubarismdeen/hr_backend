@@ -15,6 +15,8 @@ namespace DockerSqlServer
         public DbSet<LeaveSalary> LeaveSalary { get; set; }
         public DbSet<LeaveSalaryPay> leaveSalaryPay { get; set; }
         public DbSet<user> users { get; set; }
+        public DbSet<UserScreens> UserScreens { get; set; }
+        public DbSet<UserPrivileges> UserPrivileges { get; set; }
         public DbSet<DocumentDetails> DocumentDetails { get; set; }
         public DbSet<Salary> Salary { get; set; }
         public DbSet<SalaryMaster> SalaryMaster { get; set; }
@@ -32,6 +34,9 @@ namespace DockerSqlServer
         public DbSet<QuotationDetailDto> QuotationDetailDto { get; set; }
         public DbSet<EmployeeDetailsDto> EmployeeDetailsDto { get; set; }
         public DbSet<ClientDetails> ClientDetails { get; set; }
+        public DbSet<Gratuity> Gratuity { get; set; }
+        public DbSet<ServedDaysDto> ServedDaysDto { get; set; }
+        public DbSet<GratuityDetailsDto> GratuityDetailsDto { get; set; }
 
     }
 

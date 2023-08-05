@@ -13,6 +13,7 @@ namespace DockerSqlServer.Models
         public string Narration { get; set; }
         public string Name { get; set; }
         public string Date { get; set; }
+        public byte Status { get; set; }
         public int InvoiceNo { get; set; }
         public int PoNo { get; set; }
         public decimal InvoiceAmt { get; set; }
