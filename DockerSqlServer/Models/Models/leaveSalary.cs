@@ -12,7 +12,7 @@ namespace DockerSqlServer.Models
         public int Id { get; set; }
 
         [Required]
-        public short EmpCode { get; set; }
+        public String EmpCode { get; set; }
 
         [Required]
         [Column(TypeName = "decimal(8,2)")]
@@ -38,13 +38,13 @@ namespace DockerSqlServer.Models
         public string Year { get; set; }
 
         [Required]
-        public short EditBy { get; set; }
+        public String EditBy { get; set; }
 
         [Required]
         public DateTime EditDate { get; set; }
 
         [Required]
-        public short CreatBy { get; set; }
+        public String CreatBy { get; set; }
 
         [Required]
         public DateTime CreatDate { get; set; }

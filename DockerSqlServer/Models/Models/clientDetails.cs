@@ -28,13 +28,13 @@ namespace DockerSqlServer.Models
             public string Mobile2 { get; set; }
 
             [Column("editBy")]
-            public short EditBy { get; set; }
+            public String EditBy { get; set; }
 
             [Column("editDt")]
             public DateTime EditDt { get; set; }
 
             [Column("creatBy")]
-            public short CreatBy { get; set; }
+            public String CreatBy { get; set; }
 
             [Column("creatDt")]
             public DateTime CreatDt { get; set; }

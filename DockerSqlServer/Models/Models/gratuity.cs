@@ -12,7 +12,7 @@ namespace DockerSqlServer.Models
         public int Id { get; set; }
 
         [Required]
-        public short EmpCode { get; set; }
+        public String EmpCode { get; set; }
 
         [Required]
         public decimal ServedYears { get; set; }
@@ -28,13 +28,13 @@ namespace DockerSqlServer.Models
         public decimal GratuityAmt { get; set; }
 
         [Required]
-        public short EditBy { get; set; }
+        public String EditBy { get; set; }
 
         [Required]
         public DateTime EditDate { get; set; }
 
         [Required]
-        public short CreatBy { get; set; }
+        public String CreatBy { get; set; }
 
         [Required]
         public DateTime CreatDate { get; set; }

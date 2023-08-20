@@ -12,7 +12,7 @@ namespace DockerSqlServer.Models
         public int Id { get; set; }
 
         [Required]
-        public short EmpCode { get; set; }
+        public String EmpCode { get; set; }
 
         [Required]
         public decimal Basic { get; set; }

@@ -9,9 +9,9 @@ namespace DockerSqlServer.Models
         public Int32 Id { get; set; }
         public Int16 userCd { get; set; }
         public string password { get; set; }
-        public Int16? creatBy { get; set; }
+        public String creatBy { get; set; }
         public DateTime? creatDt { get; set; }
-        public Int16? EditBy { get; set; }
+        public String EditBy { get; set; }
         public DateTime? EditDt { get; set; }
     }
 

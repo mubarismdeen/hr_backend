@@ -12,7 +12,7 @@ namespace DockerSqlServer.Models
         public int Id { get; set; }
 
         [Required]
-        public short? EmpCode { get; set; }
+        public String? EmpCode { get; set; }
 
         [Required]
         public byte Type { get; set; }
@@ -40,13 +40,13 @@ namespace DockerSqlServer.Models
         public DateTime? PaidDt { get; set; }
 
         [Required]
-        public short? EditBy { get; set; }
+        public String EditBy { get; set; }
 
         [Column(TypeName = "datetime")]
         public DateTime? EditDt { get; set; }
 
         [Required]
-        public short? CreatBy { get; set; }
+        public String CreatBy { get; set; }
 
         [Column(TypeName = "datetime")]
         public DateTime? CreatDt { get; set; }

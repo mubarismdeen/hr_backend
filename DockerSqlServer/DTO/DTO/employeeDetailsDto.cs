@@ -7,7 +7,7 @@ namespace DockerSqlServer.DTO
     {
         [Key]
         public int Id { get; set; }
-        public Int16 EmpCode { get; set; }
+        public string EmpCode { get; set; }
         public string Name { get; set; }
         public string Mobile1 { get; set; }
         public string Mobile2 { get; set; }

@@ -23,9 +23,9 @@ namespace DockerSqlServer.Models
         public byte InvStatus { get; set; }
         public byte Type { get; set; }
         public string DueDate { get; set; }
-        public short EditBy { get; set; }
+        public String EditBy { get; set; }
         public DateTime EditDt { get; set; }
-        public short CreatBy { get; set; }
+        public String CreatBy { get; set; }
         public DateTime CreatDt { get; set; }
     }
 }

@@ -13,7 +13,7 @@ namespace DockerSqlServer.Models
             public int Id { get; set; }
 
             [Column("empCode")]
-            public Int16 empCode { get; set; }
+            public String empCode { get; set; }
 
             [Column("name")]
             public String name { get; set; }

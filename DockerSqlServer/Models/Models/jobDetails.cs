@@ -13,10 +13,10 @@ namespace DockerSqlServer.Models
         public string DueDate { get; set; }
         public byte JobStatus { get; set; }
         public byte Status { get; set; }
-        public short AssignedTo { get; set; }
-        public short EditBy { get; set; }
+        public String AssignedTo { get; set; }
+        public String EditBy { get; set; }
         public DateTime EditDt { get; set; }
-        public short CreatBy { get; set; }
+        public String CreatBy { get; set; }
         public DateTime CreatDt { get; set; }
     }
 }

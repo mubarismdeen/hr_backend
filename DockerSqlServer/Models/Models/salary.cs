@@ -46,13 +46,13 @@ namespace DockerSqlServer.Models
         public short Anchorage { get; set; }
 
         [Required]
-        public short EditBy { get; set; }
+        public String EditBy { get; set; }
 
         [Required]
         public DateTime EditDt { get; set; }
 
         [Required]
-        public short CreatBy { get; set; }
+        public String CreatBy { get; set; }
 
         [Required]
         public DateTime CreatDt { get; set; }

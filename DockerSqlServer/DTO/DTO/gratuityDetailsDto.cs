@@ -9,7 +9,7 @@ namespace DockerSqlServer.Models
         [Key]
         public int Id { get; set; }
 
-        public short EmpCode { get; set; }
+        public String EmpCode { get; set; }
             
         public string Name { get; set; }
 

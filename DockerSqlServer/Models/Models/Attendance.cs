@@ -14,7 +14,7 @@ namespace DockerSqlServer.Models
             public int Id { get; set; }
 
             [Column("empCode")]
-            public short EmpCode { get; set; }
+            public String EmpCode { get; set; }
 
             [Column("attendance")]
             public decimal attendance { get; set; }
@@ -42,13 +42,13 @@ namespace DockerSqlServer.Models
             public String date { get; set; }
 
             [Column("editBy")]
-            public short EditBy { get; set; }
+            public String EditBy { get; set; }
 
             [Column("editDt")]
             public DateTime EditDate { get; set; }
 
             [Column("creatBy")]
-            public short CreateBy { get; set; }
+            public String CreateBy { get; set; }
 
             [Column("creatDt")]
             public DateTime CreateDate { get; set; }
