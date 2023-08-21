@@ -121,6 +121,19 @@ namespace DockerSqlServer.Controllers
         }
 
         [HttpGet]
+        [Route("getScreensForEmployee")]
+        public async Task<ActionResult<List<UserScreens>>> getScreensForEmployee(String empCode)
+        {
+
+            string StoredProc = "select scr.* from [hr].[user] u inner join [hr].[userScreens] scr on u.userCd = scr.userId where u.empCode = '" + empCode + "'";
+
+            var t = await _db.UserScreens.FromSqlRaw(StoredProc).ToListAsync();
+
+            return t;
+
+        }
+
+        [HttpGet]
         [Route("getPrivilegesForUser")]
         public async Task<ActionResult<List<UserPrivileges>>> getPrivilegesForUser(String userName, String privilege)
         {
