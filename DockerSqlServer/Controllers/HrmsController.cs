@@ -133,6 +133,54 @@ namespace DockerSqlServer.Controllers
 
         }
 
+        [HttpPost]
+        [Route("saveScreensForEmployee")]
+        public async Task<ActionResult<bool>> saveScreensForEmployee(UserScreens userScreens)
+        {
+            try
+            {
+                int rowsAffected = 0;
+
+                var existingEntity = await _db.UserScreens.FindAsync(userScreens.Id);
+                if (existingEntity == null)
+                {
+                    userScreens.editDt = DateTime.Now;
+                    userScreens.creatDt = DateTime.Now;
+
+                    _db.UserScreens.Add(userScreens);
+                    rowsAffected = await _db.SaveChangesAsync();
+                }
+                else
+                {
+                    existingEntity.dashboard = userScreens.dashboard;
+                    existingEntity.employees = userScreens.employees;
+                    existingEntity.attendance = userScreens.attendance;
+                    existingEntity.salaryMaster = userScreens.salaryMaster;
+                    existingEntity.salaryPayout = userScreens.salaryPayout;
+                    existingEntity.leaveSalary = userScreens.leaveSalary;
+                    existingEntity.clients = userScreens.clients;
+                    existingEntity.gratuity= userScreens.gratuity;
+                    existingEntity.editBy = userScreens.editBy;
+                    existingEntity.editDt = userScreens.editDt;
+                    existingEntity.creatBy = userScreens.creatBy;
+                    existingEntity.creatDt = userScreens.creatDt;
+
+                    _db.UserScreens.Update(existingEntity);
+                    rowsAffected = await _db.SaveChangesAsync();
+                }
+
+                if (rowsAffected > 0)
+                {
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
         [HttpGet]
         [Route("getPrivilegesForUser")]
         public async Task<ActionResult<List<UserPrivileges>>> getPrivilegesForUser(String userName, String privilege)

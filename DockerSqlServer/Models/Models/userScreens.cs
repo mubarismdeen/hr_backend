@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DockerSqlServer.Models
 {
-    [Table("hr.userScreens")]
+    [Table("userScreens", Schema="hr")]
     public class UserScreens
     {
         [Key]
@@ -38,6 +38,18 @@ namespace DockerSqlServer.Models
 
         [Column("gratuity")]
         public bool gratuity { get; set; }
+
+        [Column("creatBy")]
+        public String creatBy { get; set; }
+
+        [Column("creatDt")]
+        public DateTime? creatDt { get; set; }
+
+        [Column("editBy")]
+        public String editBy { get; set; }
+
+        [Column("editDt")]
+        public DateTime? editDt { get; set; }
 
     }
 }

@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DockerSqlServer.Models
 {
-    [Table("hr.userPrivileges")]
+    [Table("userPrivileges", Schema="hr")]
     public class UserPrivileges
     {
         [Key]
@@ -29,6 +29,18 @@ namespace DockerSqlServer.Models
 
         [Column("deletePrivilege")]
         public bool? deletePrivilege { get; set; }
+
+        [Column("creatBy")]
+        public String creatBy { get; set; }
+
+        [Column("creatDt")]
+        public DateTime? creatDt { get; set; }
+
+        [Column("editBy")]
+        public String EditBy { get; set; }
+
+        [Column("editDt")]
+        public DateTime? EditDt { get; set; }
 
     }
 }
