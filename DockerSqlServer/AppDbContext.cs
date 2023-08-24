@@ -14,7 +14,7 @@ namespace DockerSqlServer
         public DbSet<docScreenDetails> docScreenDetails { get; set; }
         public DbSet<LeaveSalary> LeaveSalary { get; set; }
         public DbSet<LeaveSalaryPay> leaveSalaryPay { get; set; }
-        public DbSet<user> users { get; set; }
+        public DbSet<User> User { get; set; }
         public DbSet<UserScreens> UserScreens { get; set; }
         public DbSet<UserPrivileges> UserPrivileges { get; set; }
         public DbSet<DocumentDetails> DocumentDetails { get; set; }

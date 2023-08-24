@@ -4,8 +4,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DockerSqlServer.Models
 {
-    [Table("hr.user")]
-    public class user
+    [Table("user", Schema="hr")]
+    public class User
     {
         [Key]
         [Column("id")]

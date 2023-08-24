@@ -97,7 +97,7 @@ namespace DockerSqlServer.Controllers
         {
             string StoredProc = "select * from [hr].[user] where userCd = '" + userCd + "' and password = '" + password + "'";
 
-            var t = await _db.users.FromSqlRaw(StoredProc).ToListAsync();
+            var t = await _db.User.FromSqlRaw(StoredProc).ToListAsync();
 
 
             if (t.Count > 0)
@@ -118,6 +118,75 @@ namespace DockerSqlServer.Controllers
 
             return t;
 
+        }
+
+        [HttpGet]
+        [Route("getUserDetails")]
+        public async Task<ActionResult<List<User>>> getUserDetails(String empCode)
+        {
+
+            string StoredProc = "select * from [hr].[user] where empCode = '" + empCode + "'";
+
+            var t = await _db.User.FromSqlRaw(StoredProc).ToListAsync();
+
+            return t;
+
+        }
+
+        [HttpGet]
+        [Route("getUserDetailsWithUsername")]
+        public async Task<ActionResult<List<User>>> getUserDetailsWithUsername(String username)
+        {
+
+            string StoredProc = "select * from [hr].[user] where name = '" + username + "'";
+
+            var t = await _db.User.FromSqlRaw(StoredProc).ToListAsync();
+
+            return t;
+
+        }
+
+        [HttpPost]
+        [Route("saveUserDetails")]
+        public async Task<ActionResult<bool>> saveUserDetails(User userDetails)
+        {
+            try
+            {
+                int rowsAffected = 0;
+
+                var existingEntity = await _db.User.FindAsync(userDetails.Id);
+                if (existingEntity == null)
+                {
+                    userDetails.EditDt = DateTime.Now;
+                    userDetails.creatDt = DateTime.Now;
+
+                    short maxUserCd = await _db.User.MaxAsync(u => u.userCd);
+                    userDetails.userCd = ++maxUserCd;
+
+                    _db.User.Add(userDetails);
+                    rowsAffected = await _db.SaveChangesAsync();
+                }
+                else
+                {
+                    existingEntity.name = userDetails.name;
+                    existingEntity.password = userDetails.password;
+                    existingEntity.EditBy = userDetails.EditBy;
+                    existingEntity.EditDt = userDetails.EditDt;
+
+                    _db.User.Update(existingEntity);
+                    rowsAffected = await _db.SaveChangesAsync();
+                }
+
+                if (rowsAffected > 0)
+                {
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
         }
 
         [HttpGet]
