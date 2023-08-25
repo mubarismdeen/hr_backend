@@ -251,15 +251,65 @@ namespace DockerSqlServer.Controllers
         }
 
         [HttpGet]
-        [Route("getPrivilegesForUser")]
-        public async Task<ActionResult<List<UserPrivileges>>> getPrivilegesForUser(String userName, String privilege)
+        [Route("getAPrivilegeForUser")]
+        public async Task<ActionResult<List<UserPrivileges>>> getAPrivilegeForUser(String userName, String privilege)
         {
             string StoredProc = "select priv.* from [hr].[user] u inner join [hr].[userPrivileges] priv on u.userCd = priv.userId where u.name = '" + userName + "' and priv.privilegeName = '" + privilege + "'";
-
             var t = await _db.UserPrivileges.FromSqlRaw(StoredProc).ToListAsync();
-
             return t;
+        }
 
+        [HttpGet]
+        [Route("getAllPrivilegesForUser")]
+        public async Task<ActionResult<List<UserPrivileges>>> getAllPrivilegesForUser(String empCode)
+        {
+            string StoredProc = "select priv.* from [hr].[user] u inner join [hr].[userPrivileges] priv on u.userCd = priv.userId where u.empCode = '" + empCode + "'";
+            var t = await _db.UserPrivileges.FromSqlRaw(StoredProc).ToListAsync();
+            return t;
+        }
+
+        [HttpPost]
+        [Route("savePrivilegesForUser")]
+        public async Task<ActionResult<bool>> savePrivilegesForUser(List<UserPrivileges> privilegesList)
+        {
+            try
+            {
+                int rowsAffected = 0;
+
+                foreach (UserPrivileges privileges in privilegesList)
+                {
+                    var existingEntity = await _db.UserPrivileges.FindAsync(privileges.id);
+                    if (existingEntity == null)
+                    {
+                        privileges.EditDt = DateTime.Now;
+                        privileges.creatDt = DateTime.Now;
+
+                        _db.UserPrivileges.Add(privileges);
+                        rowsAffected = rowsAffected + await _db.SaveChangesAsync();
+                    }
+                    else
+                    {
+                        existingEntity.viewPrivilege = privileges.viewPrivilege;
+                        existingEntity.addPrivilege = privileges.addPrivilege;
+                        existingEntity.editPrivilege = privileges.editPrivilege;
+                        existingEntity.deletePrivilege = privileges.deletePrivilege;
+                        existingEntity.EditBy = privileges.EditBy;
+                        existingEntity.EditDt = privileges.EditDt;
+
+                        _db.UserPrivileges.Update(existingEntity);
+                        rowsAffected = rowsAffected + await _db.SaveChangesAsync();
+                    }
+                }
+                if (rowsAffected > 0)
+                {
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
         }
 
         [HttpGet]
