@@ -21,12 +21,12 @@ namespace DockerSqlServer.Controllers
     public class HrmsController
     {
         private readonly AppDbContext _db;
-        SqlConnection con;
+        SqlConnection _connection;
 
         public HrmsController(AppDbContext db)
         {
             _db = db;
-            con = new SqlConnection(_db.Database.GetDbConnection().ConnectionString);
+            _connection = new SqlConnection(_db.Database.GetDbConnection().ConnectionString);
         }
 
 
@@ -36,7 +36,7 @@ namespace DockerSqlServer.Controllers
         public async Task<ActionResult<bool>> LoyaltyCustomersUpdate(LyCustomersModel Ly)
         {
 
-            SqlCommand command = new SqlCommand("[dbo].[Ly_Customers_Update]", con);
+            SqlCommand command = new SqlCommand("[dbo].[Ly_Customers_Update]", _connection);
             command.CommandType = CommandType.StoredProcedure;
 
             command.Parameters.AddWithValue("@v_Cd", Ly.Cd);
@@ -73,13 +73,13 @@ namespace DockerSqlServer.Controllers
             command.Parameters.AddWithValue("@v_EditBy", Ly.EditBy);
 
             // Open the connection
-            con.Open();
+            _connection.Open();
 
             // Execute the command and get the number of rows affected
             int rowsAffected = await command.ExecuteNonQueryAsync();
 
             // Close the connection
-            con.Close();
+            _connection.Close();
 
             if (rowsAffected > 0)
             {
@@ -1745,6 +1745,34 @@ namespace DockerSqlServer.Controllers
 
             return t;
 
+        }
+
+        [HttpGet]
+        [Route("createBackup")]
+        public async Task<ActionResult<string>> createBackup()
+        {
+            try
+            {
+                
+                _connection.Open();
+
+                string databaseName = _db.Database.GetDbConnection().Database;
+                string backupFileName = $"C:\\Program Files\\Microsoft SQL Server\\MSSQL15.SQLEXPRESS\\MSSQL\\Backup\\{databaseName}_{DateTime.Now:yyyyMMddHHmmss}.bak";
+
+                string backupQuery = $"BACKUP DATABASE [{databaseName}] TO DISK = '{backupFileName}'";
+
+                using (SqlCommand sqlCommand = new SqlCommand(backupQuery, _connection))
+                {
+                    sqlCommand.ExecuteNonQuery();
+                }
+
+                return "Database backup created at " + backupFileName;
+                
+            }
+            catch (Exception ex)
+            {
+                return "Error creating database backup: " + ex.Message;
+            }
         }
 
 
