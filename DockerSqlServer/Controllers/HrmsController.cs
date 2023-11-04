@@ -636,7 +636,7 @@ namespace DockerSqlServer.Controllers
 
         [HttpPost]
         [Route("saveAttendance")]
-        public async Task<ActionResult<bool>> saveAttendance(List<Attendance> attendanceList)
+        public async Task<ActionResult<string>> saveAttendance(List<Attendance> attendanceList)
         {
 
             try
@@ -693,13 +693,13 @@ namespace DockerSqlServer.Controllers
                 {
                     await updateMonthlySalary(attendanceList);
                     await saveLeaveSalary(attendanceList);
-                    return true;
+                    return "true";
                 }
-                return false;
+                throw new Exception("Zero rows affected in the database");
             }
             catch (Exception ex)
             {
-                return false;
+                return ex.Message;
             }
         }
 
