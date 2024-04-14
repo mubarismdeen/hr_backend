@@ -1119,11 +1119,11 @@ namespace DockerSqlServer.Controllers
                                 "INNER JOIN hr.empMaster editEmp on editEmp.empCode = emp.editBy " +
                                 "INNER JOIN hr.empMaster createEmp on createEmp.empCode = emp.creatBy " +
                                 "WHERE emp.status != 2";
-
+                
             var t = await _db.EmployeeDetailsDto.FromSqlRaw(StoredProc).ToListAsync();
 
             return t;
-            // test
+            // test	3   
         }
 
         [HttpPost]
@@ -1370,7 +1370,7 @@ namespace DockerSqlServer.Controllers
                     existingEntity.DepId = empMaster.DepId;
                     existingEntity.NatianalityId = empMaster.NatianalityId;
                     existingEntity.StatusId = empMaster.StatusId;
-                    existingEntity.Type = empMaster.Type;
+                    existingEntity.Type = 1;
                     existingEntity.JoinDt = empMaster.JoinDt;
                     existingEntity.ResignDt = empMaster.ResignDt;
                     existingEntity.BirthDt = empMaster.BirthDt;
@@ -1381,6 +1381,11 @@ namespace DockerSqlServer.Controllers
 
                     _db.EmpMaster.Update(existingEntity);
                     rowsAffected = await _db.SaveChangesAsync();
+
+                    if (empMaster.StatusId == 3)
+                    {
+                        await SaveGratuityByDate(empMaster.EmpCode, empMaster.EditBy);
+                    }
                 }
 
                 if (rowsAffected > 0)
