@@ -21,12 +21,12 @@ namespace DockerSqlServer.Controllers
     public class HrmsController
     {
         private readonly AppDbContext _db;
-        SqlConnection _connection;
+        SqlConnection con;
 
         public HrmsController(AppDbContext db)
         {
             _db = db;
-            _connection = new SqlConnection(_db.Database.GetDbConnection().ConnectionString);
+            con = new SqlConnection(_db.Database.GetDbConnection().ConnectionString);
         }
 
 
@@ -36,7 +36,7 @@ namespace DockerSqlServer.Controllers
         public async Task<ActionResult<bool>> LoyaltyCustomersUpdate(LyCustomersModel Ly)
         {
 
-            SqlCommand command = new SqlCommand("[dbo].[Ly_Customers_Update]", _connection);
+            SqlCommand command = new SqlCommand("[dbo].[Ly_Customers_Update]", con);
             command.CommandType = CommandType.StoredProcedure;
 
             command.Parameters.AddWithValue("@v_Cd", Ly.Cd);
@@ -73,13 +73,13 @@ namespace DockerSqlServer.Controllers
             command.Parameters.AddWithValue("@v_EditBy", Ly.EditBy);
 
             // Open the connection
-            _connection.Open();
+            con.Open();
 
             // Execute the command and get the number of rows affected
             int rowsAffected = await command.ExecuteNonQueryAsync();
 
             // Close the connection
-            _connection.Close();
+            con.Close();
 
             if (rowsAffected > 0)
             {
@@ -228,7 +228,7 @@ namespace DockerSqlServer.Controllers
                     existingEntity.salaryPayout = userScreens.salaryPayout;
                     existingEntity.leaveSalary = userScreens.leaveSalary;
                     existingEntity.clients = userScreens.clients;
-                    existingEntity.gratuity= userScreens.gratuity;
+                    existingEntity.gratuity = userScreens.gratuity;
                     existingEntity.editBy = userScreens.editBy;
                     existingEntity.editDt = userScreens.editDt;
                     existingEntity.creatBy = userScreens.creatBy;
@@ -636,7 +636,7 @@ namespace DockerSqlServer.Controllers
 
         [HttpPost]
         [Route("saveAttendance")]
-        public async Task<ActionResult<string>> saveAttendance(List<Attendance> attendanceList)
+        public async Task<ActionResult<bool>> saveAttendance(List<Attendance> attendanceList)
         {
 
             try
@@ -693,13 +693,13 @@ namespace DockerSqlServer.Controllers
                 {
                     await updateMonthlySalary(attendanceList);
                     await saveLeaveSalary(attendanceList);
-                    return "true";
+                    return true;
                 }
-                throw new Exception("Zero rows affected in the database");
+                return false;
             }
             catch (Exception ex)
             {
-                return ex.Message;
+                return false;
             }
         }
 
@@ -1110,7 +1110,7 @@ namespace DockerSqlServer.Controllers
         public async Task<List<EmployeeDetailsDto>> getEmployeeDetails()
         {
 
-            string StoredProc = "SELECT emp.id, emp.empCode, emp.name, emp.mobile1, emp.mobile2, dep.[description] department, " +
+            string StoredProc = "SELECT emp.id, emp.empCode, emp.name, emp.mobile1, emp.mobile2, dep.[description] department,emp.resignDt," +
                                 "stat.[description] status, nat.[description] nationality, emp.birthDt, emp.joinDt, " +
                                 "editEmp.[name] editBy, emp.[editDate] editDt, createEmp.[name] createBy, emp.[creatDate] createDt " +
                                 "FROM hr.empMaster emp INNER JOIN hr.departmentMaster dep on dep.id = emp.depId " +
@@ -1370,6 +1370,7 @@ namespace DockerSqlServer.Controllers
                     existingEntity.DepId = empMaster.DepId;
                     existingEntity.NatianalityId = empMaster.NatianalityId;
                     existingEntity.StatusId = empMaster.StatusId;
+                    existingEntity.Type = empMaster.Type;
                     existingEntity.JoinDt = empMaster.JoinDt;
                     existingEntity.ResignDt = empMaster.ResignDt;
                     existingEntity.BirthDt = empMaster.BirthDt;
@@ -1647,7 +1648,7 @@ namespace DockerSqlServer.Controllers
 
         [HttpGet]
         [Route("SaveGratuityByDate")]
-        public async Task<ActionResult<bool>> SaveGratuityByDate(String empCode, byte type, string editBy)
+        public async Task<ActionResult<bool>> SaveGratuityByDate(String empCode, string editBy)
         {
 
             Gratuity gratuity = new();
@@ -1665,7 +1666,7 @@ namespace DockerSqlServer.Controllers
 
                     DateTime resignDt = empmater.ResignDt ?? DateTime.Now;
 
-                    months = 12 * (resignDt.Year - empmater.JoinDt.Year) +  resignDt.Month - empmater.JoinDt.Month ;
+                    months = 12 * (resignDt.Year - empmater.JoinDt.Year) + resignDt.Month - empmater.JoinDt.Month;
 
                 }
 
@@ -1673,7 +1674,7 @@ namespace DockerSqlServer.Controllers
 
                 gratuity.EmpCode = empCode;
                 gratuity.ServedYears = months / 12;
-                gratuity.Type = type;
+                gratuity.Type = empmater.Type;
                 gratuity.EditBy = editBy;
                 gratuity.CreatBy = editBy;
                 gratuity.EditDate = DateTime.Now;
@@ -1705,7 +1706,7 @@ namespace DockerSqlServer.Controllers
 
                     existingEntity.EditDate = DateTime.Now;
                     existingEntity.EditBy = editBy;
-                    existingEntity.Type = type;
+                    existingEntity.Type = empmater.Type;
                     existingEntity.GratuityAmt = gratuity.GratuityAmt;
                     existingEntity.ServedYears = gratuity.ServedYears;
 
@@ -1745,34 +1746,6 @@ namespace DockerSqlServer.Controllers
 
             return t;
 
-        }
-
-        [HttpGet]
-        [Route("createBackup")]
-        public async Task<ActionResult<string>> createBackup()
-        {
-            try
-            {
-                
-                _connection.Open();
-
-                string databaseName = _db.Database.GetDbConnection().Database;
-                string backupFileName = $"C:\\Program Files\\Microsoft SQL Server\\MSSQL15.SQLEXPRESS\\MSSQL\\Backup\\{databaseName}_{DateTime.Now:yyyyMMddHHmmss}.bak";
-
-                string backupQuery = $"BACKUP DATABASE [{databaseName}] TO DISK = '{backupFileName}'";
-
-                using (SqlCommand sqlCommand = new SqlCommand(backupQuery, _connection))
-                {
-                    sqlCommand.ExecuteNonQuery();
-                }
-
-                return "Database backup created at " + backupFileName;
-                
-            }
-            catch (Exception ex)
-            {
-                return "Error creating database backup: " + ex.Message;
-            }
         }
 
 

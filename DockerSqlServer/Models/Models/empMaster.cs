@@ -33,6 +33,9 @@ namespace DockerSqlServer.Models
             [Column("statusId")]
             public byte StatusId { get; set; }
 
+            [Column("type")]    
+            public byte Type { get; set; }
+
             [Column("natianalityId")]
             public byte NatianalityId { get; set; }
         
