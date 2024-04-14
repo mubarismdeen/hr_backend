@@ -14,7 +14,7 @@ namespace DockerSqlServer.DTO
         public string Department { get; set; }
         public string Status { get; set; }
         public string Nationality { get; set; }
-        public DateTime ResignDt { get; set; }
+        public DateTime? ResignDt { get; set; }
         public DateTime BirthDt { get; set; }
         public DateTime JoinDt { get; set; }
         public string EditBy { get; set; }
