@@ -1753,6 +1753,35 @@ namespace DockerSqlServer.Controllers
 
         }
 
+        [HttpGet]
+        [Route("createBackup")]
+        public async Task<ActionResult<string>> createBackup()
+        {
+            try
+            {
+
+                con.Open();
+
+                string databaseName = _db.Database.GetDbConnection().Database;
+                string backupFileName = $"C:\\Program Files\\Microsoft SQL Server\\MSSQL15.SQLEXPRESS\\MSSQL\\Backup\\{databaseName}_{DateTime.Now:yyyyMMddHHmmss}.bak";
+
+                string backupQuery = $"BACKUP DATABASE [{databaseName}] TO DISK = '{backupFileName}'";
+
+                using (SqlCommand sqlCommand = new SqlCommand(backupQuery, con))
+                {
+                    sqlCommand.ExecuteNonQuery();
+                }
+
+                return "Database backup created at " + backupFileName;
+
+            }
+            catch (Exception ex)
+            {
+                return "Error creating database backup: " + ex.Message;
+            }
+        }
+
+
 
 
     }
