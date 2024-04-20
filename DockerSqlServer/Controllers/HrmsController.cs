@@ -112,7 +112,9 @@ namespace DockerSqlServer.Controllers
         [Route("authorizeUser")]
         public async Task<ActionResult<List<UserScreens>>> authorizeUser(String userName, String password)
         {
-            string StoredProc = "select scr.* from [hr].[user] u inner join [hr].[userScreens] scr on u.userCd = scr.userId where u.name = '" + userName + "' and u.password = '" + password + "'";
+            string StoredProc = "select scr.* from [hr].[user] u inner join [hr].[userScreens] scr on u.userCd = scr.userId " + 
+                "inner join [hr].[empMaster] emp on emp.empCode = u.empCode where u.name = '" + userName + "' and u.password = '" + password + "'" + 
+                " and emp.statusId != 3";
 
             var t = await _db.UserScreens.FromSqlRaw(StoredProc).ToListAsync();
 
@@ -1188,7 +1190,7 @@ namespace DockerSqlServer.Controllers
                                 "(select name from[hr].[user] where userCd = jod.editBy) editBy," +
                                 "(select name from[hr].[user] where userCd = ISNULL(jod.creatby,1)) creatBy " +
                                 "from hr.jobDetails jod " +
-                                "INNER JOIN hr.statusMaster stm on stm.id = jod.jobStatus " +
+                                "INNER JOIN hr.jobStatus stm on stm.id = jod.jobStatus " +
                                 "where JobStatus Like '%" + JobStatus + "%' and AssignedTo Like '%" + AssignedTo + "%' " +
                                 "and DueDate Like '%" + DueDate + "' and Status != 2";
 
@@ -1243,7 +1245,7 @@ namespace DockerSqlServer.Controllers
         [Route("getjobStatus")]
         public async Task<ActionResult<List<DocType>>> getjobStatus()
         {
-            string StoredProc = "select * from hr.statusMaster";
+            string StoredProc = "select * from hr.jobStatus";
 
             var t = await _db.DocType.FromSqlRaw(StoredProc).ToListAsync();
 
